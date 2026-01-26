@@ -6,3 +6,5 @@ __pycache__/
 
 datasets/
 
+raw_videos/
+raw_glove/
