@@ -35,7 +35,13 @@ Build your dataset by recording new samples:
 python -m app.training.collect_data --modality camera --action yang --samples 20
 ```
 
-### 2. Training
+### 2. Data Augmentation (Optional)
+Multiply your dataset size (4x) with synthetic variations:
+```bash
+python -m app.training.augment_data
+```
+
+### 3. Training
 Train the modality-specific models:
 ```bash
 python -m app.training.train_camera

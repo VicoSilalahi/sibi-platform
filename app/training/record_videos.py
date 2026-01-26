@@ -1,0 +1,71 @@
+import cv2
+import os
+import time
+import argparse
+from app.config import ACTIONS, SEQUENCE_LENGTH
+
+def record_raw_videos(action, num_samples, output_dir='raw_videos'):
+    """Record raw videos for a specific action."""
+    action_dir = os.path.join(output_dir, action)
+    os.makedirs(action_dir, exist_ok=True)
+    
+    cap = cv2.VideoCapture(0)
+    # Set to a common resolution (e.g., 640x480)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    
+    # Define codec and VideoWriter settings
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    
+    print(f"Recording {num_samples} raw videos for action: '{action}'")
+    print("Starting in 3 seconds...")
+    time.sleep(3)
+    
+    for sample_num in range(num_samples):
+        # Find next available filename
+        existing_videos = [v for v in os.listdir(action_dir) if v.endswith('.avi')]
+        video_num = 0
+        if existing_videos:
+            video_num = max([int(v.split('.')[0]) for v in existing_videos]) + 1
+        
+        video_path = os.path.join(action_dir, f"{video_num}.avi")
+        out = cv2.VideoWriter(video_path, fourcc, 30.0, (640, 480))
+        
+        print(f"Recording Video {video_num}...")
+        
+        frame_count = 0
+        while frame_count < SEQUENCE_LENGTH:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            
+            # Show live feedback with frame count
+            display_frame = frame.copy()
+            cv2.putText(display_frame, f"RECORDING: {action} | {frame_count}/{SEQUENCE_LENGTH}", 
+                        (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+            cv2.imshow("Record Raw Videos", display_frame)
+            
+            out.write(frame)
+            frame_count += 1
+            
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+        
+        out.release()
+        print(f"Saved {video_path}")
+        time.sleep(1) # Small break between samples
+        
+    cap.release()
+    cv2.destroyAllWindows()
+
+def main():
+    parser = argparse.ArgumentParser(description="Record Raw Videos for SIBI Dataset")
+    parser.add_argument("--action", type=str, required=True, choices=ACTIONS, help="Action to record")
+    parser.add_argument("--samples", type=int, default=1, help="Number of videos to record")
+    parser.add_argument("--outdir", type=str, default="raw_videos", help="Directory to save videos")
+    
+    args = parser.parse_args()
+    record_raw_videos(args.action, args.samples, args.outdir)
+
+if __name__ == "__main__":
+    main()

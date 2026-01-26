@@ -6,10 +6,19 @@ This document provides a deep dive into the technical design and architectural d
 
 The system follows a "Raw Landmarks" architecture to minimize storage and maximize CPU efficiency.
 
-### Landmark Extraction
-- **Camera Modality**: Uses MediaPipe Holistic. Instead of saving raw video frames, the system extracts 75 keypoints (33 pose, 21 left hand, 21 right hand) per frame.
-- **Dimensionality**: Each landmark has $(x, y, z)$ coordinates, resulting in a $(75, 3)$ input vector per frame.
-- **Normalization**: Coordinates are normalized by MediaPipe relative to the frame dimensions $(0.0 - 1.0)$.
+### Parallel Landmark Extraction (Multi-threaded)
+The system now uses a dual-threaded pipeline:
+1. **Capture Thread**: Continuously reads raw frames from the camera.
+2. **Process Thread**: Fetches frames and runs MediaPipe Holistic.
+This decoupling ensures the UI never hangs, even if MediaPipe's inference time fluctuates.
+
+### Signal Filtering (Moving Average)
+To improve model accuracy, we've implemented an **EMA (Exponential Moving Average)** filter in `app/inference/filters.py`. This smooths out coordinate jitter from the camera stream before it is fed into the GRU.
+
+### Data Augmentation
+A new utility `app/training/augment_data.py` allows for synthetic expansion of the landmark dataset via:
+- **Spatial**: Scaling, Rotation, and Gaussian Jitter.
+- **Robustness**: These augmentations make the system more tolerant to different camera distances and hand positions.
 
 ### Sliding Window Mechanism
 For real-time inference, the system maintains a queue (buffer) of the last 30 frames.

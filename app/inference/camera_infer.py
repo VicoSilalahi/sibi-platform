@@ -1,6 +1,7 @@
 import numpy as np
 from app.config import ACTIONS, CONFIDENCE_THRESHOLD, TEMPORAL_STABILITY_FRAMES, SEQUENCE_LENGTH, INFERENCE_STRIDE
 from app.inference.gating import is_camera_active
+from app.inference.filters import EMAFilter
 
 class CameraInference:
     def __init__(self, model):
@@ -10,6 +11,7 @@ class CameraInference:
         self.current_label = "No sign"
         self.current_confidence = 0.0
         self.frame_count = 0
+        self.filter = EMAFilter(alpha=0.6) # Smooth landmarks
 
     def process_frame(self, landmarks):
         """Process a single frame and return the detected sign.
@@ -19,6 +21,9 @@ class CameraInference:
         Returns:
             tuple: (label, confidence)
         """
+        # Apply smoothing filter
+        landmarks = self.filter.apply(landmarks)
+        
         self.sequence.append(landmarks)
         self.sequence = self.sequence[-SEQUENCE_LENGTH:] # Keep last frames
         self.frame_count += 1
