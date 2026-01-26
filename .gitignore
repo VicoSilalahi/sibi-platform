@@ -1,0 +1,8 @@
+# SIBI Platform
+
+venv/
+__pycache__/
+.env
+
+datasets/
+
