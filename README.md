@@ -53,7 +53,7 @@ python sibi.py export                      # Export to TF-Lite
 
 ### 5. Run Inference
 ```bash
-python sibi.py run --mode camera
+python sibi.py run --modality camera
 ```
 
 ## Project Structure

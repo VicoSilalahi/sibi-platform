@@ -62,7 +62,7 @@ def cmd_export(args):
 
 def cmd_run(args):
     """Run real-time inference."""
-    run_module("app.main", ["--mode", args.mode])
+    run_module("app.main", ["--mode", args.modality])
 
 def main():
     parser = argparse.ArgumentParser(
@@ -106,7 +106,7 @@ def main():
 
     # Run
     p_run = subparsers.add_parser("run", help="Run real-time inference")
-    p_run.add_argument("--mode", choices=["camera", "glove"], default="camera")
+    p_run.add_argument("--modality", choices=["camera", "glove"], default="camera")
 
     if len(sys.argv) == 1:
         parser.print_help()
