@@ -60,6 +60,12 @@ def cmd_export(args):
     """Export to TF-Lite."""
     run_module("scripts.export_tflite")
 
+def cmd_migrate(args):
+    """Migrate and consolidate raw data."""
+    pass_args = []
+    if args.undo: pass_args.append("--undo")
+    run_module("scripts.migrate_data", pass_args)
+
 def cmd_run(args):
     """Run real-time inference."""
     run_module("app.main", ["--mode", args.modality])
@@ -104,6 +110,10 @@ def main():
     # Export
     subparsers.add_parser("export", help="Export models to TF-Lite")
 
+    # Migrate
+    p_migrate = subparsers.add_parser("migrate", help="Consolidate and rename raw data")
+    p_migrate.add_argument("--undo", action="store_true", help="Remove _done suffix to allow re-ingestion")
+
     # Run
     p_run = subparsers.add_parser("run", help="Run real-time inference")
     p_run.add_argument("--modality", choices=["camera", "glove"], default="camera")
@@ -123,6 +133,7 @@ def main():
         "augment": cmd_augment,
         "train": cmd_train,
         "export": cmd_export,
+        "migrate": cmd_migrate,
         "run": cmd_run
     }
 

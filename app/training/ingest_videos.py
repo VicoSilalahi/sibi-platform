@@ -24,18 +24,19 @@ def ingest_videos(input_dir='raw_videos'):
             
         print(f"Processing videos for action: '{action}'")
         loader = VideoLoader(action_dir)
-        processed_dir = os.path.join(action_dir, "processed")
-        os.makedirs(processed_dir, exist_ok=True)
-        
+        from app.config import INGESTED_SUFFIX
         def save_callback(filename, landmarks):
             video_path = os.path.join(action_dir, filename)
             if landmarks:
                 save_sequence(action, landmarks, modality='camera')
-                # Move to processed folder
-                dest_path = os.path.join(processed_dir, filename)
-                import shutil
-                shutil.move(video_path, dest_path)
-                print(f"Moved {filename} to processed/")
+                
+                # Mark as ingested by renaming with suffix
+                name, ext = os.path.splitext(filename)
+                new_filename = f"{name}{INGESTED_SUFFIX}{ext}"
+                dest_path = os.path.join(action_dir, new_filename)
+                
+                os.rename(video_path, dest_path)
+                print(f"Ingested and marked: {new_filename}")
             else:
                 print(f"Failed to extract landmarks from {filename}")
 

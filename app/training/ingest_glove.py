@@ -24,20 +24,25 @@ def ingest_glove(input_dir='raw_glove'):
             continue
             
         print(f"Processing glove logs for action: '{action}'")
-        processed_dir = os.path.join(action_dir, "processed")
-        os.makedirs(processed_dir, exist_ok=True)
+        from app.config import INGESTED_SUFFIX
+        # Get and sort CSV files numerically, skipping ingested ones
+        raw_files = [f for f in os.listdir(action_dir) if f.endswith('.csv')]
+        files = [f for f in raw_files if INGESTED_SUFFIX not in f]
         
-        # Get and sort CSV files numerically
-        files = [f for f in os.listdir(action_dir) if f.endswith('.csv')]
-        
-        def get_file_num(filename):
+        def get_sort_key(filename):
             name = os.path.splitext(filename)[0]
+            if "_" in name:
+                parts = name.split('_')
+                try:
+                    return [int(p) for p in parts]
+                except ValueError:
+                    return [float('inf'), name]
             try:
-                return int(name)
+                return [int(name), 0]
             except ValueError:
-                return filename
+                return [float('inf'), name]
                 
-        files.sort(key=get_file_num)
+        files.sort(key=get_sort_key)
 
         for log_file in files:
             log_path = os.path.join(action_dir, log_file)
@@ -51,9 +56,14 @@ def ingest_glove(input_dir='raw_glove'):
                 
                 if len(sequence_data) > 0:
                     save_sequence(action, np.array(sequence_data), modality='glove')
-                    # Move to processed folder
-                    shutil.move(log_path, os.path.join(processed_dir, log_file))
-                    print(f"Moved {log_file} to processed/")
+                    
+                    # Mark as ingested by renaming with suffix
+                    name, ext = os.path.splitext(log_file)
+                    new_filename = f"{name}{INGESTED_SUFFIX}{ext}"
+                    dest_path = os.path.join(action_dir, new_filename)
+                    
+                    os.rename(log_path, dest_path)
+                    print(f"Ingested and marked: {new_filename}")
                 else:
                     print(f"Empty log file: {log_file}")
             except Exception as e:

@@ -21,14 +21,14 @@ def record_raw_videos(action, num_samples, output_dir='raw_videos'):
     print("Starting in 3 seconds...")
     time.sleep(3)
     
+    import socket
+    hostname = socket.gethostname().replace(" ", "_")
+    
     for sample_num in range(num_samples):
-        # Find next available filename
-        existing_videos = [v for v in os.listdir(action_dir) if v.endswith('.avi')]
-        video_num = 0
-        if existing_videos:
-            video_num = max([int(v.split('.')[0]) for v in existing_videos]) + 1
-        
-        video_path = os.path.join(action_dir, f"{video_num}.avi")
+        # Generate unique filename: hostname_timestamp.avi
+        timestamp = int(time.time())
+        video_name = f"{hostname}_{timestamp}.avi"
+        video_path = os.path.join(action_dir, video_name)
         out = cv2.VideoWriter(video_path, fourcc, 30.0, (640, 480))
         
         # Grace period with countdown

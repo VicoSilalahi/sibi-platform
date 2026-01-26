@@ -14,11 +14,12 @@ Traditional video-based recognition is slow. Our platform converts visual data i
 ### Parallel Landmark Extraction (Multi-threaded)
 The system uses a dual-threaded pipeline (Capture & Process) to ensure a consistent 60 FPS UI, even on low-end hardware.
 
-### Deterministic Video Ingestion
-To maintain the relative order of recorded samples, the ingestion pipeline implements:
-1. **Natural Numeric Sorting**: Videos named `1.avi`, `2.avi`, `10.avi` are processed in strict numerical order (1 -> 2 -> 10) instead of alphabetical (1 -> 10 -> 2).
-2. **Post-Ingestion Migration**: Successfully processed videos are automatically moved to a `processed/` folder. This acts as a "checksum" to prevent duplicate data if the script is run multiple times.
-This ensures the display (UI) consistently runs at 60 FPS, even if landmark extraction drops to 15-20 FPS.
+### Unique & Flat Data Ingestion
+To maintain a scalable and collision-free dataset, the ingestion pipeline implements:
+1. **Host-Locked Naming**: Each recording is tagged as `[hostname]_[timestamp].avi`. This allows multiple users to contribute raw data without filename collisions.
+2. **In-Place Flagging**: Instead of moving files to subfolders, the system appends a `_done` suffix (e.g., `asus_1706600000_done.avi`) after successful ingestion.
+3. **Consolidation CLI**: The `migrate` command provides a unified way to clean up old `processed/` subfolders and reset the `_done` status for re-ingestion.
+This flat structure simplifies version control and makes the raw data storage more transparent compared to nested subdirectories.
 
 ### Signal Filtering (Jitter Reduction)
 Landmarks extracted from webcams are naturally "jumpy" (jitter). We apply an **Exponential Moving Average (EMA) Filter** ($\alpha=0.6$) to the landmark stream. This smooths out micro-tremors, allowing the GRU model to focus on the overall intent of the gesture rather than sensor noise.

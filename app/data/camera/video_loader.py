@@ -11,8 +11,14 @@ class VideoLoader:
         landmarks_sequence = []
         cap = cv2.VideoCapture(video_path)
         
+        from app.config import MP_MODEL_COMPLEXITY, MP_STATIC_IMAGE_MODE
         mp_holistic, _ = _get_mp()
-        with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
+        with mp_holistic.Holistic(
+            static_image_mode=MP_STATIC_IMAGE_MODE,
+            model_complexity=MP_MODEL_COMPLEXITY,
+            min_detection_confidence=0.5, 
+            min_tracking_confidence=0.5
+        ) as holistic:
             while cap.isOpened():
                 ret, frame = cap.read()
                 if not ret:
@@ -27,17 +33,30 @@ class VideoLoader:
 
     def process_directory(self, callback):
         """Process all videos in the directory and call callback with results."""
-        files = [v for v in os.listdir(self.video_dir) if v.endswith(('.mp4', '.avi', '.mov'))]
+        from app.config import INGESTED_SUFFIX
+        raw_files = [v for v in os.listdir(self.video_dir) if v.endswith(('.mp4', '.avi', '.mov'))]
         
-        # Sort files numerically if they follow the pattern "number.ext"
-        def get_file_num(filename):
+        # Skip files that were already ingested
+        files = [f for f in raw_files if INGESTED_SUFFIX not in f]
+        
+        # Robust sorting: 0.avi < 1.avi < 0_timestamp.avi
+        def get_sort_key(filename):
             name = os.path.splitext(filename)[0]
+            if "_" in name:
+                # Handle timestamped collisions: [original_num, timestamp]
+                parts = name.split('_')
+                try:
+                    return [int(p) for p in parts]
+                except ValueError:
+                    return [float('inf'), name]
             try:
-                return int(name)
+                # Handle pure numbers: [num, 0]
+                return [int(name), 0]
             except ValueError:
-                return filename # Fallback to string for non-numeric names
+                # Fallback for anything else
+                return [float('inf'), name]
                 
-        files.sort(key=get_file_num)
+        files.sort(key=get_sort_key)
 
         for video_file in files:
             video_path = os.path.join(self.video_dir, video_file)

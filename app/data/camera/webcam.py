@@ -24,8 +24,14 @@ class WebcamHandler:
 
     def _process_thread(self):
         """Thread for MediaPipe processing."""
+        from app.config import MP_MODEL_COMPLEXITY, MP_STATIC_IMAGE_MODE
         mp_holistic, _ = _get_mp()
-        with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
+        with mp_holistic.Holistic(
+            static_image_mode=MP_STATIC_IMAGE_MODE,
+            model_complexity=MP_MODEL_COMPLEXITY,
+            min_detection_confidence=0.5, 
+            min_tracking_confidence=0.5
+        ) as holistic:
             while self.running:
                 try:
                     frame = self.frame_queue.get(timeout=1)

@@ -15,14 +15,14 @@ def record_raw_glove(action, num_samples, output_dir='raw_glove'):
     
     print(f"Recording {num_samples} raw glove samples for action: '{action}'")
     
+    import socket
+    hostname = socket.gethostname().replace(" ", "_")
+    
     for _ in range(num_samples):
-        # Find next available filename
-        existing_logs = [v for v in os.listdir(action_dir) if v.endswith('.csv')]
-        log_num = 0
-        if existing_logs:
-            log_num = max([int(v.split('.')[0]) for v in existing_logs]) + 1
-        
-        log_path = os.path.join(action_dir, f"{log_num}.csv")
+        # Generate unique filename: hostname_timestamp.csv
+        timestamp = int(time.time())
+        log_name = f"{hostname}_{timestamp}.csv"
+        log_path = os.path.join(action_dir, log_name)
         
         # Grace period with countdown
         print(f"\nRecording Sample {log_num} in {GRACE_PERIOD_SECONDS} seconds...")
