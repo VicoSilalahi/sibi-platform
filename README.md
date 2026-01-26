@@ -2,21 +2,21 @@
 
 A modular, optimized Python application for real-time SIBI (Sistem Isyarat Bahasa Indonesia) recognition using GRU-based deep learning. Designed for low-end CPUs and industrial reliability.
 
-## 🚀 Key Features
+## Key Features
 - **Optimized for CPU**: Uses GRU instead of LSTM and supports TF-Lite for low-latency inference.
 - **Modular Data Ingestion**: Unified landmark extraction for live webcam and offline videos.
 - **Dual Modality**: Built-in support for Camera (MediaPipe) and Glove (Serial/Raw) data.
 - **Stable Inference**: Sliding temporal windows (30 frames) with gating and confidence thresholds.
 - **Instant Loading**: Implementation of lazy imports reduces startup time from 30s to <1s.
 
-## 🛠️ Installation
+## Installation
 1. Clone the repository.
 2. Install dependencies:
    ```bash
    pip install opencv-python mediapipe tensorflow scikit-learn numpy
    ```
 
-## 📖 Quick Start
+## Quick Start
 
 **Action Management:**
 View current actions and sample statistics:
@@ -48,7 +48,7 @@ Run real-time recognition with the UI:
 python -m app.main --mode camera
 ```
 
-## 📁 Project Structure
+## Project Structure
 - `app/data/`: Modality-specific extraction and readers.
 - `app/models/`: GRU definitions and management utilities.
 - `app/inference/`: Sliding window and gating logic.
@@ -57,5 +57,5 @@ python -m app.main --mode camera
 - `app/config.py`: Shared constants and performance tweaks.
 - `datasets/`: Storage for captured landmarks and sensor readings.
 
-## 📜 Technical Details
+## Technical Details
 For an in-depth breakdown of the architecture, data flow, and optimizations, see [TECHNICAL_EXPLANATION.md](./TECHNICAL_EXPLANATION.md).
