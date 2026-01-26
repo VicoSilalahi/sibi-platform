@@ -2,14 +2,14 @@
 
 A modular, high-performance Python application for real-time SIBI (Sistem Isyarat Bahasa Indonesia) recognition. This platform is optimized for low-end CPUs and provides a complete pipeline from data collection to deployment.
 
-## ✨ High-Performance Features
+## High-Performance Features
 - **GPU-Grade Performance on CPU**: Transitioned from LSTM to optimized GRU layers with TF-Lite support (~33% faster).
 - **Parallel Pipeline**: Multi-threaded landmark extraction ensures a consistent 60 FPS UI responsiveness.
 - **Robust Inference**: Signal filtering (EMA) reduces landmark jitter for higher accuracy.
 - **Dual Modality**: Built-in support for **Camera** (MediaPipe) and **Glove** (Serial Sensor) inputs.
 - **Instant Initialization**: Lazy imports reduce startup time from 30s to <1s.
 
-## 🚀 Unified CLI Control
+## Unified CLI Control
 All platform features are accessible through the central **`sibi.py`** script.
 
 ### 1. Installation
@@ -56,7 +56,7 @@ python sibi.py export                      # Export to TF-Lite
 python sibi.py run --mode camera
 ```
 
-## 📁 Project Structure
+## Project Structure
 - `sibi.py`: The unified control script.
 - `app/data/`: Extraction modules (Webcam, Video, Glove).
 - `app/models/`: GRU architectures and TFLite utilities.
@@ -65,6 +65,6 @@ python sibi.py run --mode camera
 - `datasets/`: The landmark-based "Source of Truth" (.npy).
 - `raw_videos/` & `raw_glove/`: Temporary storage for raw source data.
 
-## 📚 Technical Reference
+## Technical Reference
 - [TECHNICAL_EXPLANATION.md](./TECHNICAL_EXPLANATION.md): Deep dive into architecture and optimizations.
 - [OPTIMIZATION_STRATEGIES.md](./OPTIMIZATION_STRATEGIES.md): Roadmap for advanced hardware tuning.
