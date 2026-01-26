@@ -7,8 +7,8 @@ def get_glove_gru_model():
     model = Sequential([
         Input(shape=GLOVE_INPUT_SHAPE),  # (30, 22)
         
-        # Temporal modeling with GRU (Optimized: single layer, small hidden state)
-        GRU(32, return_sequences=False),
+        # Temporal modeling with GRU (Optimized: single layer, small hidden state, unrolled for TFLite)
+        GRU(32, return_sequences=False, unroll=True),
         
         Dropout(0.2),
         

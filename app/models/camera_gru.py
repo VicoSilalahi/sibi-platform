@@ -14,8 +14,8 @@ def get_camera_gru_model():
         
         Dropout(0.2),
         
-        # Temporal modeling with GRU (Optimized: single layer, fewer units)
-        GRU(64, return_sequences=False),
+        # Temporal modeling with GRU (Optimized: single layer, fewer units, unrolled for TFLite)
+        GRU(64, return_sequences=False, unroll=True),
         
         Dropout(0.2),
         

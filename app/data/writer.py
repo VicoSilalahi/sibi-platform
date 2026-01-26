@@ -13,8 +13,9 @@ def save_sequence(action, sequence_data, modality='camera'):
     action_path = os.path.join(DATA_PATH, modality, action)
     os.makedirs(action_path, exist_ok=True)
     
-    # Find the next sequence number
-    existing_sequences = [d for d in os.listdir(action_path) if os.path.isdir(os.path.join(action_path, d))]
+    # Find the next sequence number (only looking at folders that are numbers)
+    existing_sequences = [d for d in os.listdir(action_path) 
+                          if os.path.isdir(os.path.join(action_path, d)) and d.isdigit()]
     sequence_num = 0
     if existing_sequences:
         sequence_num = max([int(s) for s in existing_sequences]) + 1

@@ -5,7 +5,7 @@ import numpy as np
 from app.config import ACTIONS, ACTIONS_FILE, DATA_PATH
 
 def get_sample_counts(modality='camera'):
-    """Count samples per action for a given modality."""
+    """Count original and augmented samples per action for a given modality."""
     counts = {}
     modality_path = os.path.join(DATA_PATH, modality)
     
@@ -13,23 +13,34 @@ def get_sample_counts(modality='camera'):
         action_path = os.path.join(modality_path, action)
         if os.path.exists(action_path):
             # Count directories in the action folder
-            samples = [d for d in os.listdir(action_path) if os.path.isdir(os.path.join(action_path, d))]
-            counts[action] = len(samples)
+            all_samples = [d for d in os.listdir(action_path) if os.path.isdir(os.path.join(action_path, d))]
+            original = [d for d in all_samples if not d.startswith('aug_')]
+            augmented = [d for d in all_samples if d.startswith('aug_')]
+            counts[action] = {
+                'original': len(original),
+                'total': len(all_samples)
+            }
         else:
-            counts[action] = 0
+            counts[action] = {'original': 0, 'total': 0}
     return counts
 
 def list_actions():
     """Display current actions and their sample counts."""
     print("\n--- SIBI Dataset Overview ---")
-    print(f"{'Action':<15} | {'Camera Samples':<15} | {'Glove Samples':<15}")
-    print("-" * 50)
+    print(f"{'Action':<15} | {'Camera (Orig/Total)':<20} | {'Glove (Orig/Total)':<20}")
+    print("-" * 60)
     
     cam_counts = get_sample_counts('camera')
     glove_counts = get_sample_counts('glove')
     
     for action in ACTIONS:
-        print(f"{action:<15} | {cam_counts.get(action, 0):<15} | {glove_counts.get(action, 0):<15}")
+        c = cam_counts.get(action, {'original': 0, 'total': 0})
+        g = glove_counts.get(action, {'original': 0, 'total': 0})
+        
+        cam_str = f"{c['original']:>3} ({c['total']:>3})"
+        glove_str = f"{g['original']:>3} ({g['total']:>3})"
+        
+        print(f"{action:<15} | {cam_str:<20} | {glove_str:<20}")
     print(f"\nTotal Actions: {len(ACTIONS)}")
 
 def add_action(new_action):

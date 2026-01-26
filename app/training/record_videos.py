@@ -2,7 +2,7 @@ import cv2
 import os
 import time
 import argparse
-from app.config import ACTIONS, SEQUENCE_LENGTH
+from app.config import ACTIONS, SEQUENCE_LENGTH, GRACE_PERIOD_SECONDS
 
 def record_raw_videos(action, num_samples, output_dir='raw_videos'):
     """Record raw videos for a specific action."""
@@ -31,6 +31,18 @@ def record_raw_videos(action, num_samples, output_dir='raw_videos'):
         video_path = os.path.join(action_dir, f"{video_num}.avi")
         out = cv2.VideoWriter(video_path, fourcc, 30.0, (640, 480))
         
+        # Grace period with countdown
+        for i in range(GRACE_PERIOD_SECONDS, 0, -1):
+            start_wait = time.time()
+            while time.time() - start_wait < 1:
+                ret, frame = cap.read()
+                if not ret: break
+                display_frame = frame.copy()
+                cv2.putText(display_frame, f"GET READY: {i}", (200, 240),
+                            cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 5)
+                cv2.imshow("Record Raw Videos", display_frame)
+                cv2.waitKey(1)
+
         print(f"Recording Video {video_num}...")
         
         frame_count = 0

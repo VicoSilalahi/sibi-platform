@@ -37,6 +37,9 @@ TEMPORAL_STABILITY_FRAMES = 5
 MOTION_ENERGY_THRESHOLD = 0.01  # Minimum variance in landmarks to be considered active
 IDLE_SENSOR_VARIANCE = 0.05    # Near zero variance for glove sensors
 
+# Data Collection Settings
+GRACE_PERIOD_SECONDS = 2  # Wait N seconds before each sample recording
+
 # Path for saved models
 MODEL_PATH = os.path.join('app', 'models', 'saved_models')
 os.makedirs(MODEL_PATH, exist_ok=True)

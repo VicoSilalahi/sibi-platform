@@ -27,11 +27,22 @@ class VideoLoader:
 
     def process_directory(self, callback):
         """Process all videos in the directory and call callback with results."""
-        for video_file in os.listdir(self.video_dir):
-            if video_file.endswith(('.mp4', '.avi', '.mov')):
-                video_path = os.path.join(self.video_dir, video_file)
-                # Assuming filename or parent dir determines action label
-                # This depends on user's dataset structure
-                # For now, just extract and return
-                landmarks = self.get_video_landmarks(video_path)
-                callback(video_file, landmarks)
+        files = [v for v in os.listdir(self.video_dir) if v.endswith(('.mp4', '.avi', '.mov'))]
+        
+        # Sort files numerically if they follow the pattern "number.ext"
+        def get_file_num(filename):
+            name = os.path.splitext(filename)[0]
+            try:
+                return int(name)
+            except ValueError:
+                return filename # Fallback to string for non-numeric names
+                
+        files.sort(key=get_file_num)
+
+        for video_file in files:
+            video_path = os.path.join(self.video_dir, video_file)
+            # Assuming filename or parent dir determines action label
+            # This depends on user's dataset structure
+            # For now, just extract and return
+            landmarks = self.get_video_landmarks(video_path)
+            callback(video_file, landmarks)

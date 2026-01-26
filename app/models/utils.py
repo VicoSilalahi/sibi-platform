@@ -31,6 +31,13 @@ def convert_to_tflite(name):
         # Optimize for size/latency
         converter.optimizations = [tf.lite.Optimize.DEFAULT]
         
+        # RNN Fixes: Enable Select TF ops and disable tensor list lowering
+        converter.target_spec.supported_ops = [
+            tf.lite.OpsSet.TFLITE_BUILTINS, # enable TensorFlow Lite ops.
+            tf.lite.OpsSet.SELECT_TF_OPS    # enable TensorFlow ops.
+        ]
+        converter._experimental_lower_tensor_list_ops = False
+        
         tflite_model = converter.convert()
         with open(tflite_path, 'wb') as f:
             f.write(tflite_model)

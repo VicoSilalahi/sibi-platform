@@ -13,7 +13,9 @@ def ingest_videos(input_dir='raw_videos'):
     # Using VideoLoader to process each action subdirectory
     for action in os.listdir(input_dir):
         if action not in ACTIONS:
-            print(f"Skipping unknown action: {action}")
+            # Skip only if it's not a known action and not the 'processed' global folder (if it exists)
+            if action != "processed":
+                print(f"Skipping unknown action: {action}")
             continue
             
         action_dir = os.path.join(input_dir, action)
@@ -22,10 +24,18 @@ def ingest_videos(input_dir='raw_videos'):
             
         print(f"Processing videos for action: '{action}'")
         loader = VideoLoader(action_dir)
+        processed_dir = os.path.join(action_dir, "processed")
+        os.makedirs(processed_dir, exist_ok=True)
         
         def save_callback(filename, landmarks):
+            video_path = os.path.join(action_dir, filename)
             if landmarks:
                 save_sequence(action, landmarks, modality='camera')
+                # Move to processed folder
+                dest_path = os.path.join(processed_dir, filename)
+                import shutil
+                shutil.move(video_path, dest_path)
+                print(f"Moved {filename} to processed/")
             else:
                 print(f"Failed to extract landmarks from {filename}")
 
