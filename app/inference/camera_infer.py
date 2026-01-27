@@ -29,13 +29,17 @@ class CameraInference:
         self.frame_count += 1
 
         if len(self.sequence) == SEQUENCE_LENGTH and (self.frame_count % INFERENCE_STRIDE == 0):
-            # Check gating
+            # Check gating (Motion Energy)
             if not is_camera_active(np.array(self.sequence)):
+                # If we were previously detecting something, log that it stopped due to lack of movement
+                if self.current_label != "No sign":
+                    print("[Gating] No motion detected, clearing label.")
                 self.current_label = "No sign"
                 self.current_confidence = 0.0
                 return self.current_label, self.current_confidence
 
             # Predict
+            print(".", end="", flush=True)
             res = self.model.predict(np.expand_dims(self.sequence, axis=0))[0]
             action_idx = np.argmax(res)
             confidence = res[action_idx]

@@ -30,12 +30,18 @@ CAMERA_INPUT_SHAPE = (SEQUENCE_LENGTH, CAMERA_LANDMARKS, 3)
 GLOVE_SENSORS = 22  # (5 flex + 6 MPU) * 2
 
 # MediaPipe Optimization
-MP_MODEL_COMPLEXITY = 1  # 0 = Lite, 1 = Full, 2 = Heavy (Use 0 for bad laptops)
-MP_STATIC_IMAGE_MODE = False # False = treat as video stream (faster)
+# MediaPipe Optimization
+MP_MODEL_COMPLEXITY = 0  # 0 = Lite (Fastest), 1 = Full, 2 = Heavy
+MP_STATIC_IMAGE_MODE = False # False = treat as video stream
+MP_INTERNAL_WIDTH = 160   # Downscale boost: Lower = Faster
+MP_INTERNAL_HEIGHT = 120
+MP_USE_CROP = True        # Enable ROI cropping
+MP_CROP_SIZE = 400        
+UI_FPS = 30               # Throttle UI to save CPU for AI
 GLOVE_INPUT_SHAPE = (SEQUENCE_LENGTH, GLOVE_SENSORS)
 
 # Inference Stability & Performance
-INFERENCE_STRIDE = 10   # Run inference every N frames (1 = every frame, 5 = every 5 frames)
+INFERENCE_STRIDE = 1    # Run inference every fresh AI update (cheaper with TF-Lite)
 INGESTED_SUFFIX = "_done" # Suffix to mark raw files as processed
 CONFIDENCE_THRESHOLD = 0.7
 TEMPORAL_STABILITY_FRAMES = 5

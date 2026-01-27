@@ -64,11 +64,28 @@ def cmd_migrate(args):
     """Migrate and consolidate raw data."""
     pass_args = []
     if args.undo: pass_args.append("--undo")
+    if args.mark_done: pass_args.append("--mark-done")
     run_module("scripts.migrate_data", pass_args)
+
+def cmd_profile(args):
+    """Profile inference performance."""
+    run_module("app.tools.profiler", ["--mode", "benchmark", "--frames", str(args.frames)])
+
+def cmd_batch_run(args):
+    """Run batch (offline) inference."""
+    run_module("app.tools.profiler", ["--mode", "batch"])
 
 def cmd_run(args):
     """Run real-time inference."""
-    run_module("app.main", ["--mode", args.modality])
+    pass_args = ["--mode", args.modality]
+    if args.headless: pass_args.append("--headless")
+    run_module("app.main", pass_args)
+
+def cmd_install_service(args):
+    """Install systemd service."""
+    pass_args = []
+    if args.install: pass_args.append("--install")
+    run_module("app.services.linux_service", pass_args)
 
 def main():
     parser = argparse.ArgumentParser(
@@ -112,11 +129,25 @@ def main():
 
     # Migrate
     p_migrate = subparsers.add_parser("migrate", help="Consolidate and rename raw data")
-    p_migrate.add_argument("--undo", action="store_true", help="Remove _done suffix to allow re-ingestion")
+    p_migrate.add_argument("--undo", action="store_true", help="Remove _done suffix")
+    p_migrate.add_argument("--mark-done", action="store_true", help="Mark all files as ingested manually")
+
+    # Profile
+    p_profile = subparsers.add_parser("profile", help="Profile inference performance")
+    p_profile.add_argument("--frames", type=int, default=100, help="Number of frames to profile")
+    p_profile.add_argument("--mode", choices=["benchmark", "batch"], default="benchmark", help="Profiling mode")
+
+    # Batch Run
+    subparsers.add_parser("batch-run", help="Run batch (offline) inference")
 
     # Run
     p_run = subparsers.add_parser("run", help="Run real-time inference")
     p_run.add_argument("--modality", choices=["camera", "glove"], default="camera")
+    p_run.add_argument("--headless", action="store_true", help="Run in headless mode (no UI)")
+
+    # Install Service
+    p_service = subparsers.add_parser("install-service", help="Generate/Install systemd service (Linux)")
+    p_service.add_argument("--install", action="store_true", help="Install to user systemd directory")
 
     if len(sys.argv) == 1:
         parser.print_help()
@@ -134,7 +165,11 @@ def main():
         "train": cmd_train,
         "export": cmd_export,
         "migrate": cmd_migrate,
-        "run": cmd_run
+        "profile": cmd_profile,
+        "batch-run": cmd_batch_run,
+        "batch-run": cmd_batch_run,
+        "run": cmd_run,
+        "install-service": cmd_install_service
     }
 
     if args.command in cmd_map:
