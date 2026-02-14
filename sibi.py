@@ -62,9 +62,7 @@ def cmd_export(args):
 
 def cmd_migrate(args):
     """Migrate and consolidate raw data."""
-    pass_args = []
-    if args.undo: pass_args.append("--undo")
-    run_module("scripts.migrate_data", pass_args)
+    run_module("scripts.migrate_data", [args.mode])
 
 def cmd_run(args):
     """Run real-time inference."""
@@ -111,8 +109,9 @@ def main():
     subparsers.add_parser("export", help="Export models to TF-Lite")
 
     # Migrate
-    p_migrate = subparsers.add_parser("migrate", help="Consolidate and rename raw data")
-    p_migrate.add_argument("--undo", action="store_true", help="Remove _done suffix to allow re-ingestion")
+    p_migrate = subparsers.add_parser("migrate", help="Consolidate and process raw data")
+    p_migrate.add_argument("mode", choices=["rename", "done", "reset"], 
+                         help="rename: Fix names | done: Mark as ingested | reset: Allow re-ingestion")
 
     # Run
     p_run = subparsers.add_parser("run", help="Run real-time inference")
