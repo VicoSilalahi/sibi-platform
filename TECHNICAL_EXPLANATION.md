@@ -52,6 +52,6 @@ To further reduce CPU load, the system allows skipping inference for a fixed num
 ### Lazy Loading
 To ensure the CLI feels responsive, we implemented lazy loading for TensorFlow and MediaPipe. These heavy libraries are only imported inside the specific functions that require them.
 - **Result**: `python -m app.main --help` returns in **<0.5s**, compared to **30s+** if libraries were imported at the top level.
-
+y
 ### Dynamic Configuration
 All sign labels are managed via `actions.json`. The app dynamically builds its UI and final classification layers based on this file, allowing for easy extension without codebase modification.

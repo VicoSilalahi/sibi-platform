@@ -35,7 +35,7 @@ MP_STATIC_IMAGE_MODE = False # False = treat as video stream (faster)
 GLOVE_INPUT_SHAPE = (SEQUENCE_LENGTH, GLOVE_SENSORS)
 
 # Inference Stability & Performance
-INFERENCE_STRIDE = 10   # Run inference every N frames (1 = every frame, 5 = every 5 frames)
+INFERENCE_STRIDE = 1    # Run inference every N frames (1 = every frame, 5 = every 5 frames)
 INGESTED_SUFFIX = "_done" # Suffix to mark raw files as processed
 CONFIDENCE_THRESHOLD = 0.7
 TEMPORAL_STABILITY_FRAMES = 5

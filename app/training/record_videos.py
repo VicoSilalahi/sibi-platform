@@ -43,7 +43,7 @@ def record_raw_videos(action, num_samples, output_dir='raw_videos'):
                 cv2.imshow("Record Raw Videos", display_frame)
                 cv2.waitKey(1)
 
-        print(f"Recording Video {video_num}...")
+        print(f"Recording Video {sample_num + 1} of {num_samples}...")
         
         frame_count = 0
         while frame_count < SEQUENCE_LENGTH:

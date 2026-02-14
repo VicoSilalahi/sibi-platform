@@ -5,6 +5,19 @@ from app.models.camera_gru import get_camera_gru_model
 from app.training.data_loader import load_data
 from app.models.utils import save_model
 
+# --- Tambahkan Bagian Ini di Paling Atas File train_camera.py ---
+import sys
+import os
+
+# Pastikan folder tempat config_gpu.py berada bisa terbaca
+# Sesuaikan path ini dengan lokasi Anda menyimpan file config_gpu.py tadi
+
+try:
+    from app.training.config_gpu import configure_gpu
+    configure_gpu() # <--- INI PENTING!
+except ImportError:
+    print("⚠️ Warning: config_gpu.py tidak ditemukan, mencoba jalan tanpa config.")
+
 def train_camera():
     # Load data
     print("Loading camera data...")
