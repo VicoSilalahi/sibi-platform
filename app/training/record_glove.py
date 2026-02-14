@@ -18,34 +18,46 @@ def record_raw_glove(action, num_samples, output_dir='raw_glove'):
     import socket
     hostname = socket.gethostname().replace(" ", "_")
     
-    for _ in range(num_samples):
+    for sample_num in range(num_samples):
         # Generate unique filename: hostname_timestamp.csv
         timestamp = int(time.time())
         log_name = f"{hostname}_{timestamp}.csv"
         log_path = os.path.join(action_dir, log_name)
         
+        # Check if glove is alive
+        if not reader.connected:
+             print("\nERROR: Glove not connected. Please check serial port.")
+             break
+             
         # Grace period with countdown
-        print(f"\nRecording Sample {log_num} in {GRACE_PERIOD_SECONDS} seconds...")
+        print(f"\nRecording Sample {sample_num + 1} of {num_samples} in {GRACE_PERIOD_SECONDS} seconds...")
         for i in range(GRACE_PERIOD_SECONDS, 0, -1):
             print(f"{i}...")
             time.sleep(1)
             
+        # Final liveness check right before REC
+        if not reader.is_alive():
+            print("WARNING: No data detected from glove! Check connection.")
+            
         print(f"REC >>>")
         
         sequence_data = []
+        start_time = time.time()
         for i in range(SEQUENCE_LENGTH):
             frame = reader.read_frame()
             sequence_data.append(frame)
-            # Small delay to simulate 30Hz if reader doesn't block
-            # In a real scenario, Serial.read() blocks until data arrives.
-            time.sleep(0.033) 
+            # Adjust sleep to maintain 30Hz target
+            elapsed = time.time() - start_time
+            expected = (i + 1) * 0.033
+            if expected > elapsed:
+                time.sleep(expected - elapsed)
             
         # Save to CSV
         with open(log_path, 'w', newline='') as f:
             writer = csv.writer(f)
             writer.writerows(sequence_data)
             
-        print(f"Saved {log_path}")
+        print(f"Saved {log_path} (Duration: {time.time()-start_time:.2f}s)")
         time.sleep(1) # Small break between samples
         
     print("\nRecording complete.")

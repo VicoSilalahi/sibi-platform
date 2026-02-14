@@ -22,10 +22,10 @@ def run_camera_inference():
     print("Starting camera inference. Press 'q' to quit.")
     
     for image, landmarks, results in webcam.get_frames():
-        label, confidence = infer.process_frame(landmarks)
+        label, confidence, is_active, energy = infer.process_frame(landmarks)
         
         # UI Overlay
-        image = render_ui(image, label, confidence)
+        image = render_ui(image, label, confidence, is_active, energy)
         
         cv2.namedWindow("SIBI Platform - Camera", cv2.WND_PROP_FULLSCREEN)
         cv2.imshow("SIBI Platform - Camera", image)
@@ -49,12 +49,16 @@ def run_glove_inference():
     try:
         while True:
             sensor_data = reader.read_frame()
-            label, confidence = infer.process_frame(sensor_data)
+            label, confidence, is_active, energy = infer.process_frame(sensor_data)
             
+            status = "[REC]" if is_active else "[IDLE]"
             if label != "No sign":
-                print(f"Detected: {label} ({int(confidence*100)}%)")
+                print(f"{status} (Energy: {energy:.4f}) Detected: {label} ({int(confidence*100)}%)")
+            else:
+                print(f"{status} Energy: {energy:.4f}                       ", end="\r")
+            
     except KeyboardInterrupt:
-        print("Stopped.")
+        print("\nStopped.")
 
 def main():
     parser = argparse.ArgumentParser(description="SIBI Platform Dynamic Sign Language Recognition")

@@ -7,10 +7,10 @@ def is_camera_active(window):
     Args:
         window (np.array): Shape (SEQUENCE_LENGTH, 75, 3)
     Returns:
-        bool: True if motion energy is above threshold.
+        tuple: (bool, float) - (is_active, energy)
     """
     if len(window) < 2:
-        return False
+        return False, 0.0
         
     # Calculate variance of landmarks across time
     # Focus on hand landmarks (index 33 to 75) as pose often has jitter
@@ -18,7 +18,7 @@ def is_camera_active(window):
     variance = np.var(hand_landmarks, axis=0)
     avg_variance = np.mean(variance)
     
-    return avg_variance > MOTION_ENERGY_THRESHOLD
+    return avg_variance > MOTION_ENERGY_THRESHOLD, avg_variance
 
 def is_glove_active(window):
     """Check if there is sufficient variance in the glove sensors.
@@ -26,12 +26,12 @@ def is_glove_active(window):
     Args:
         window (np.array): Shape (SEQUENCE_LENGTH, 22)
     Returns:
-        bool: True if sensor variance is above threshold.
+        tuple: (bool, float) - (is_active, energy)
     """
     if len(window) < 2:
-        return False
+        return False, 0.0
         
     variance = np.var(window, axis=0)
     avg_variance = np.mean(variance)
     
-    return avg_variance > IDLE_SENSOR_VARIANCE
+    return avg_variance > IDLE_SENSOR_VARIANCE, avg_variance
