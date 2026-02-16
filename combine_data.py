@@ -19,8 +19,10 @@ def merge_directories(source_dirs, target_dir, copy_mode=True):
             continue
             
         print(f"\nProcessing source: {src}")
-        # Use the source directory name as a prefix to prevent collisions
-        prefix = os.path.basename(os.path.normpath(src))
+        # Use the source directory name as a prefix, but strip 'raw_videos_'/'raw_glove_'
+        # for folder name consistency between hardware types
+        folder_name = os.path.basename(os.path.normpath(src))
+        prefix = folder_name.replace('raw_videos_', '').replace('raw_glove_', '')
         
         for action in os.listdir(src):
             action_path = os.path.join(src, action)
