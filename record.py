@@ -208,13 +208,16 @@ def record_data(mode, action, num_samples, sequence_length, grace_period, output
     cv2.destroyAllWindows()
 
 def main():
+    hostname = socket.gethostname().replace(" ", "_").lower()
+    default_outdir = f"raw_videos_{hostname}"
+
     parser = argparse.ArgumentParser(description="Standalone SIBI Data Recorder")
     parser.add_argument("--mode", type=str, choices=['camera', 'glove', 'both'], help="Recording mode")
     parser.add_argument("--action", type=str, help="Action to record")
     parser.add_argument("--samples", type=int, default=5, help="Number of videos/logs to record")
     parser.add_argument("--len", type=int, default=60, help="Frames per sample")
     parser.add_argument("--grace", type=int, default=3, help="Countdown seconds")
-    parser.add_argument("--outdir", type=str, default="raw_data", help="Output folder")
+    parser.add_argument("--outdir", type=str, default=default_outdir, help=f"Output folder (default: {default_outdir})")
     parser.add_argument("--port", type=str, default="COM3", help="Glove serial port")
     
     args = parser.parse_args()
