@@ -4,7 +4,7 @@ import queue
 from app.data.camera.extractor import mediapipe_detection, extract_keypoints, _get_mp
 
 class WebcamHandler:
-    def __init__(self, camera_index=0, width=640, height=480):
+    def __init__(self, camera_index=0, width=1280, height=960):
         self.camera_index = camera_index
         self.width = width
         self.height = height

@@ -11,8 +11,8 @@ def record_raw_videos(action, num_samples, output_dir='raw_videos'):
     
     cap = cv2.VideoCapture(0)
     # Set to a common resolution (e.g., 640x480)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 960)
     
     # Define codec and VideoWriter settings
     fourcc = cv2.VideoWriter_fourcc(*'XVID')

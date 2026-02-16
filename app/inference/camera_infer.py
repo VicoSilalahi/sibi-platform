@@ -2,25 +2,16 @@ import numpy as np
 from app.config import ACTIONS, CONFIDENCE_THRESHOLD, TEMPORAL_STABILITY_FRAMES, SEQUENCE_LENGTH, INFERENCE_STRIDE
 from app.inference.gating import is_camera_active
 from app.inference.filters import EMAFilter
+import subprocess
 
 from gtts import gTTS
 import os
 
-def voice(text):
-    print(f"Sedang memproses suara: '{text}'...")
-    
-    # 2. Proses Teks ke Suara Google (Bahasa Indonesia: 'id')
-    tts = gTTS(text=text, lang='id')
-    
-    # 3. Simpan sementara sebagai mp3
-    filename = "temp_voice.mp3"
-    tts.save(filename)
-    
-    # 4. Putar menggunakan mpg123 (perintah sistem Arch)
-    os.system(f"mpg123 -q {filename}")
-    
-    # Opsional: Hapus file setelah diputar
-    os.remove(filename)
+def bicara_piper(teks):
+    # Ganti path model dengan file .onnx yang sudah kamu download
+    model = "./piper/id_ID-news_tts-medium.onnx" 
+    command = f'echo "{teks}" | ./piper/piper --model {model} --output_raw | aplay -r 22050 -f S16_LE -t raw'
+    subprocess.run(command, shell=True)
 
 class CameraInference:
     def __init__(self, model):
@@ -73,7 +64,7 @@ class CameraInference:
                             if confidence > CONFIDENCE_THRESHOLD:
                                 action_label = ACTIONS[action_idx]
                                 if action_label != self.action_label_now:
-                                    voice(ACTIONS[action_idx])
+                                    bicara_piper(ACTIONS[action_idx])
                                     self.action_label_now = action_label
                                     self.current_label = ACTIONS[action_idx]
                                     self.current_confidence = confidence
