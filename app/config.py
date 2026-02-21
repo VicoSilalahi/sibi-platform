@@ -20,6 +20,9 @@ else:
 # Number of sequences per action (for training) without --samples flag this will be the default
 NO_SEQUENCES = 30
 
+# Activate or deactivate mediapipe point on opencv
+ACTIVATE_DRAWING_POINT = True
+
 # Sequence length (frames/data points)
 SEQUENCE_LENGTH = 60
 
@@ -30,7 +33,7 @@ CAMERA_INPUT_SHAPE = (SEQUENCE_LENGTH, CAMERA_LANDMARKS, 3)
 GLOVE_SENSORS = 22  # (5 flex + 6 MPU) * 2
 
 # MediaPipe Optimization
-MP_MODEL_COMPLEXITY = 2  # 0 = Lite, 1 = Full, 2 = Heavy (Use 0 for bad laptops)
+MP_MODEL_COMPLEXITY = 1  # 0 = Lite, 1 = Full, 2 = Heavy (Use 0 for bad laptops)
 MP_STATIC_IMAGE_MODE = False # False = treat as video stream (faster)
 GLOVE_INPUT_SHAPE = (SEQUENCE_LENGTH, GLOVE_SENSORS)
 

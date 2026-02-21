@@ -2,6 +2,7 @@ import cv2
 import threading
 import queue
 from app.data.camera.extractor import mediapipe_detection, extract_keypoints, _get_mp, draw_styled_landmarks
+from app.config import ACTIVATE_DRAWING_POINT
 
 class WebcamHandler:
     def __init__(self, camera_index=0, width=1280, height=960):
@@ -37,7 +38,8 @@ class WebcamHandler:
                     frame = self.frame_queue.get(timeout=1)
                     image, results = mediapipe_detection(frame, hands)
                     landmarks = extract_keypoints(results)
-                    draw_styled_landmarks(image, results)
+                    if ACTIVATE_DRAWING_POINT:
+                        draw_styled_landmarks(image, results)
                     if not self.results_queue.full():
                         self.results_queue.put((image, landmarks, results))
                 except queue.Empty:

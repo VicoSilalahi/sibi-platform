@@ -1,6 +1,7 @@
 import cv2
 import os
 from app.data.camera.extractor import mediapipe_detection, extract_keypoints, _get_mp, draw_styled_landmarks
+from app.config import ACTIVATE_DRAWING_POINT
 
 class VideoLoader:
     def __init__(self, video_dir):
@@ -25,7 +26,8 @@ class VideoLoader:
                     break
                 
                 image, results = mediapipe_detection(frame, holistic)
-                draw_styled_landmarks(image, results)
+                if ACTIVATE_DRAWING_POINT:
+                    draw_styled_landmarks(image, results)
                 landmarks = extract_keypoints(results)
                 landmarks_sequence.append(landmarks)
                 

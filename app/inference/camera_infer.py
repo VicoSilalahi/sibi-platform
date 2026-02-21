@@ -22,6 +22,8 @@ class CameraInference:
         self.current_confidence = 0.0
         self.frame_count = 0
         self.filter = EMAFilter(alpha=0.6) # Smooth landmarks
+        self.start_time = None
+        self.time_duration = 5.0
         self.action_label_now = None
 
     def process_frame(self, landmarks):
