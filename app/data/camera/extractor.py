@@ -8,6 +8,16 @@ _mp_drawing = None
 def _get_mp():
     global _mp_holistic, _mp_drawing
     if _mp_holistic is None:
+        # Pre-emptively set matplotlib backend to 'Agg' to avoid Colab errors
+        # before mediapipe (which imports matplotlib) is loaded.
+        import os
+        os.environ['MPLBACKEND'] = 'Agg'
+        try:
+            import matplotlib
+            matplotlib.use('Agg')
+        except ImportError:
+            pass
+
         import mediapipe as mp
         try:
             from mediapipe.python.solutions import holistic as _mp_holistic

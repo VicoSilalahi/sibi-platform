@@ -4,6 +4,12 @@ from app.data.camera.video_loader import VideoLoader
 from app.data.writer import save_sequence
 from app.config import ACTIONS, DATA_PATH
 
+try:
+    from app.training.config_gpu import configure_gpu
+    configure_gpu()
+except ImportError:
+    pass
+
 def ingest_videos(input_dir='raw_videos'):
     """Ingest raw videos from directory into the landmark dataset."""
     if not os.path.exists(input_dir):
