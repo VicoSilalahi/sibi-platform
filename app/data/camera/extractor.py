@@ -16,7 +16,6 @@ def _get_mp():
             import mediapipe.solutions.holistic as _mp_holistic
             import mediapipe.solutions.drawing_utils as _mp_drawing
     return _mp_holistic, _mp_drawing
-
 def mediapipe_detection(image, model):
     """Perform MediaPipe detection on an image."""
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)

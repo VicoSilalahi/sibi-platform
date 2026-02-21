@@ -1,6 +1,6 @@
 import cv2
 import os
-from app.data.camera.extractor import mediapipe_detection, extract_keypoints, _get_mp
+from app.data.camera.extractor import mediapipe_detection, extract_keypoints, _get_mp, draw_styled_landmarks
 
 class VideoLoader:
     def __init__(self, video_dir):
@@ -12,11 +12,11 @@ class VideoLoader:
         cap = cv2.VideoCapture(video_path)
         
         from app.config import MP_MODEL_COMPLEXITY, MP_STATIC_IMAGE_MODE
-        mp_holistic, _ = _get_mp()
+        mp_holistic, mp_drawing = _get_mp()
         with mp_holistic.Holistic(
             static_image_mode=MP_STATIC_IMAGE_MODE,
             model_complexity=MP_MODEL_COMPLEXITY,
-            min_detection_confidence=0.5, 
+            min_detection_confidence=0.7, 
             min_tracking_confidence=0.5
         ) as holistic:
             while cap.isOpened():
@@ -24,7 +24,8 @@ class VideoLoader:
                 if not ret:
                     break
                 
-                _, results = mediapipe_detection(frame, holistic)
+                image, results = mediapipe_detection(frame, holistic)
+                draw_styled_landmarks(image, results)
                 landmarks = extract_keypoints(results)
                 landmarks_sequence.append(landmarks)
                 

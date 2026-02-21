@@ -1,7 +1,7 @@
 import cv2
 import threading
 import queue
-from app.data.camera.extractor import mediapipe_detection, extract_keypoints, _get_mp
+from app.data.camera.extractor import mediapipe_detection, extract_keypoints, _get_mp, draw_styled_landmarks
 
 class WebcamHandler:
     def __init__(self, camera_index=0, width=1280, height=960):
@@ -25,22 +25,26 @@ class WebcamHandler:
     def _process_thread(self):
         """Thread for MediaPipe processing."""
         from app.config import MP_MODEL_COMPLEXITY, MP_STATIC_IMAGE_MODE
-        mp_holistic, _ = _get_mp()
+        mp_holistic, mp_drawing = _get_mp()
         with mp_holistic.Holistic(
             static_image_mode=MP_STATIC_IMAGE_MODE,
             model_complexity=MP_MODEL_COMPLEXITY,
-            min_detection_confidence=0.5, 
+            min_detection_confidence=0.7, 
             min_tracking_confidence=0.5
-        ) as holistic:
+        ) as hands:
             while self.running:
                 try:
                     frame = self.frame_queue.get(timeout=1)
-                    image, results = mediapipe_detection(frame, holistic)
+                    image, results = mediapipe_detection(frame, hands)
                     landmarks = extract_keypoints(results)
+                    draw_styled_landmarks(image, results)
                     if not self.results_queue.full():
                         self.results_queue.put((image, landmarks, results))
                 except queue.Empty:
                     continue
+                except Exception as e:
+                    print(f"Error pada loop deteksi: {e}")
+                    break
 
     def start(self):
         self.cap = cv2.VideoCapture(self.camera_index)
