@@ -1,0 +1,7 @@
+customtkinter
+opencv-python
+tensorflow
+mediapipe==0.10.9
+numpy
+pyserial
+# aplay is required on Linux for voice.py, but it's a system dependency.

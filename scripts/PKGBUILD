@@ -1,0 +1,25 @@
+pkgname=sibi-platform
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Unified SIBI Sign Language Recognition Platform"
+arch=('x86_64')
+url="https://github.com/Vicosilalahi/sibi-platform"
+license=('MIT')
+depends=('python-customtkinter' 'python-opencv' 'python-tensorflow' 'python-mediapipe' 'python-numpy' 'aplay')
+source=("sibi-platform::git+https://github.com/Vicosilalahi/sibi-platform.git")
+sha256sums=('SKIP')
+
+build() {
+  cd "$srcdir/$pkgname"
+  # We can either package the source or the Nuitka build
+  # For Arch, packaging the source is more idiomatic
+}
+
+package() {
+  cd "$srcdir/$pkgname"
+  install -d "$pkgdir/opt/$pkgname"
+  cp -r * "$pkgdir/opt/$pkgname/"
+  
+  install -d "$pkgdir/usr/bin"
+  ln -s "/opt/$pkgname/sibi.py" "$pkgdir/usr/bin/sibi"
+}

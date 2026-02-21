@@ -10,7 +10,7 @@ DATA_PATH = os.path.join('datasets')
 
 # Dynamic Action Loading
 import json
-ACTIONS_FILE = 'actions.json'
+ACTIONS_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'actions.json')
 if os.path.exists(ACTIONS_FILE):
     with open(ACTIONS_FILE, 'r') as f:
         ACTIONS = np.array(json.load(f))

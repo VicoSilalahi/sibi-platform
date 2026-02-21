@@ -8,11 +8,12 @@ from app.data.glove.reader import GloveReader
 from app.models.utils import load_model
 from app.ui import render_ui
 
-def run_camera_inference():
+def run_camera_inference(model_name=None):
     """Run real-time inference using the webcam."""
-    model = load_model("camera_gru")
+    name = model_name or "camera_gru"
+    model = load_model(name)
     if model is None:
-        print("Camera model not found. Please run 'python -m app.training.train_camera' first.")
+        print(f"Model '{name}' not found. Please train it first.")
         return
 
     infer = CameraInference(model)
@@ -35,11 +36,12 @@ def run_camera_inference():
 
     webcam.stop()
 
-def run_glove_inference():
+def run_glove_inference(model_name=None):
     """Run real-time inference using the glove sensors."""
-    model = load_model("glove_gru")
+    name = model_name or "glove_gru"
+    model = load_model(name)
     if model is None:
-        print("Glove model not found. Please run 'python -m app.training.train_glove' first.")
+        print(f"Model '{name}' not found. Please train it first.")
         return
 
     infer = GloveInference(model)
@@ -64,13 +66,14 @@ def main():
     parser = argparse.ArgumentParser(description="SIBI Platform Dynamic Sign Language Recognition")
     parser.add_argument("--mode", type=str, default="camera", choices=["camera", "glove"],
                         help="Operation mode: camera or glove")
+    parser.add_argument("--model", type=str, help="Name or path of the model to load")
     
     args = parser.parse_args()
 
     if args.mode == "camera":
-        run_camera_inference()
+        run_camera_inference(args.model)
     elif args.mode == "glove":
-        run_glove_inference()
+        run_glove_inference(args.model)
 
 if __name__ == "__main__":
     main()

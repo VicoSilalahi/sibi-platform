@@ -6,16 +6,14 @@ from pathlib import Path
 def configure_gpu():
     print("🔧 SEDANG MENGKONFIGURASI GPU & XLA...")
     
-    # 1. Cari path environment
-    env_path = sys.prefix
-    site_packages = glob.glob(os.path.join(env_path, "lib", "python*", "site-packages"))[0]
+    # 1. Cari path environment secara cross-platform
+    import sysconfig
+    site_packages = sysconfig.get_path('purelib')
     
-    # 2. Cari file 'libdevice.10.bc' (Kunci utamanya!)
-    # Biasanya ada di: site-packages/nvidia/cuda_nvcc/nvvm/libdevice/libdevice.10.bc
-    # Atau di sistem: /usr/lib/cuda/nvvm/libdevice/libdevice.10.bc
-    
+    # 2. Cari file 'libdevice.10.bc'
     possible_paths = [
         os.path.join(site_packages, "nvidia", "cuda_nvcc", "nvvm", "libdevice", "libdevice.10.bc"),
+        os.path.join(sys.prefix, "Lib", "site-packages", "nvidia", "cuda_nvcc", "nvvm", "libdevice", "libdevice.10.bc"), # Windows fallback
         "/usr/lib/cuda/nvvm/libdevice/libdevice.10.bc", # Arch Linux default
         "/opt/cuda/nvvm/libdevice/libdevice.10.bc"
     ]
@@ -34,25 +32,25 @@ def configure_gpu():
     print(f"✅ Libdevice ditemukan di: {found_path}")
 
     # 3. Set Environment Variable 'XLA_FLAGS'
-    # Kita harus menunjuk ke folder INDUK dari folder 'nvvm'
-    # Jika file di: .../nvidia/cuda_nvcc/nvvm/libdevice/libdevice.10.bc
-    # Maka Cuda Dir adalah: .../nvidia/cuda_nvcc/
-    
-    cuda_dir = str(Path(found_path).parents[2]) # Naik 2 level dari folder libdevice
-    
-    # Set flag XLA agar TF tahu di mana cuda berada
+    cuda_dir = str(Path(found_path).parents[2])
     os.environ['XLA_FLAGS'] = f"--xla_gpu_cuda_data_dir={cuda_dir}"
     print(f"✅ XLA_FLAGS diset ke: {cuda_dir}")
 
-    # 4. Inject LD_LIBRARY_PATH (Agar library runtime terbaca)
-    # Ini script yang kita pakai sebelumnya, kita gabung di sini biar praktis.
+    # 4. Inject library paths (LD_LIBRARY_PATH for Linux, PATH for Windows)
     nvidia_base = os.path.join(site_packages, "nvidia")
     libs_paths = glob.glob(os.path.join(nvidia_base, "*", "lib"))
     
-    # Gabungkan dengan path yang sudah ada
-    current_ld = os.environ.get("LD_LIBRARY_PATH", "")
-    new_ld = ":".join(libs_paths) + ":" + current_ld
-    os.environ["LD_LIBRARY_PATH"] = new_ld
+    if os.name == 'nt':  # Windows
+        # On Windows, we add to PATH
+        current_path = os.environ.get("PATH", "")
+        new_path = ";".join(libs_paths) + ";" + current_path
+        os.environ["PATH"] = new_path
+        print("✅ PATH updated with NVIDIA libraries.")
+    else:  # Linux
+        current_ld = os.environ.get("LD_LIBRARY_PATH", "")
+        new_ld = ":".join(libs_paths) + ":" + current_ld
+        os.environ["LD_LIBRARY_PATH"] = new_ld
+        print("✅ LD_LIBRARY_PATH updated with NVIDIA libraries.")
     
     return True
 

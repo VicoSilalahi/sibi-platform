@@ -1,6 +1,7 @@
 import numpy as np
 from app.config import ACTIONS, CONFIDENCE_THRESHOLD, TEMPORAL_STABILITY_FRAMES, SEQUENCE_LENGTH, INFERENCE_STRIDE
 from app.inference.gating import is_glove_active
+from app.voice import bicara_piper
 
 class GloveInference:
     def __init__(self, model):
@@ -10,6 +11,7 @@ class GloveInference:
         self.current_label = "No sign"
         self.current_confidence = 0.0
         self.frame_count = 0
+        self.action_label_now = None
 
     def process_frame(self, sensor_data):
         """Process a single frame of sensor data and return the detected sign.
@@ -46,10 +48,15 @@ class GloveInference:
                     if len(self.predictions) == TEMPORAL_STABILITY_FRAMES:
                         if all(p == action_idx for p in self.predictions):
                             if confidence > CONFIDENCE_THRESHOLD:
-                                self.current_label = ACTIONS[action_idx]
-                                self.current_confidence = confidence
+                                action_label = ACTIONS[action_idx]
+                                if action_label != self.action_label_now:
+                                    bicara_piper(ACTIONS[action_idx])
+                                    self.action_label_now = action_label
+                                    self.current_label = ACTIONS[action_idx]
+                                    self.current_confidence = confidence
                             else:
                                 self.current_label = "No sign"
                                 self.current_confidence = 0.0
+                                self.action_label_now = None
 
         return self.current_label, self.current_confidence, is_active, energy
